@@ -13,9 +13,8 @@ SELECT
     wa_average,
     variance_from_wa_avg,
     rolling_4period_avg
-FROM gold.ed_waittime_trends
-WHERE below_target = 1
-ORDER BY time_period_start DESC, four_hour_departure_rate ASC;
+FROM ed_waittime_trends
+WHERE below_target = 1;
 GO
 
 -- View 2: WA performance summary for the latest reporting period
@@ -30,9 +29,9 @@ SELECT
         CAST(SUM(CASE WHEN below_target = 1 THEN 1 ELSE 0 END) AS FLOAT) /
         COUNT(*) * 100, 1
     ) AS pct_below_target
-FROM gold.ed_waittime_trends
+FROM ed_waittime_trends
 WHERE time_period_start = (
-    SELECT MAX(time_period_start) FROM gold.ed_waittime_trends
+    SELECT MAX(time_period_start) FROM ed_waittime_trends
 )
 GROUP BY time_period_start;
 GO
@@ -46,10 +45,9 @@ SELECT
     ROUND(MIN(four_hour_departure_rate), 2) AS min_4hr_rate,
     ROUND(MAX(four_hour_departure_rate), 2) AS max_4hr_rate,
     SUM(CASE WHEN below_target = 1 THEN 1 ELSE 0 END) AS periods_below_target
-FROM gold.ed_waittime_trends
+FROM ed_waittime_trends
 WHERE health_service IS NOT NULL
-GROUP BY health_service
-ORDER BY avg_4hr_rate DESC;
+GROUP BY health_service;
 GO
 
 -- ============================================================
