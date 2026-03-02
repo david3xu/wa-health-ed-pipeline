@@ -97,6 +97,10 @@ def ingest_wa_hospitals(client):
         resp.raise_for_status()
         all_units = resp.json().get("result", [])
 
+        # Debug: inspect the first unit's structure to verify field names
+        # Uncomment if the filter returns 0 hospitals to check API response shape
+        # import json as _json; print(_json.dumps(all_units[0], indent=2))
+
         # Filter to WA hospitals only
         wa_hospitals = [
             u for u in all_units
