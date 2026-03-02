@@ -29,11 +29,11 @@ NOTEBOOKS_DIR = Path(__file__).parent.parent / "notebooks"
 
 # Notebook name -> Fabric item ID (updated automatically after each sync)
 NOTEBOOK_IDS = {
-    "00_eda_bronze":  "fb33bd0e-1100-46ec-aab4-c5dba2be8c4f",
-    "01_silver_ed_performance": "63799309-b76f-4c50-9c3f-344cc15cb970",
-    "02_silver_dim_hospitals": "1aec9e09-93b2-4d2c-b260-2d34efb1930a",
-    "03_gold_ed_trends":  "c723fa72-f691-4985-b117-e24bf47ac3d7",
-    "04_graph_hospital_network": "c40c4276-feed-4006-867e-7ddc40a3f0e0",
+    "00_eda_bronze":  "f9735b0c-eb80-473a-b96f-ff0ceeaf7f2f",
+    "01_silver_ed_performance": "bc2b94ce-32a7-41b1-93c5-3d97162dd384",
+    "02_silver_dim_hospitals": "c139d854-cca5-4a36-8615-1c4d108c2700",
+    "03_gold_ed_trends":  "6b2bd5ef-b2c7-4f4e-a3f0-b2dfb660123a",
+    "04_graph_hospital_network": "78aa8bc8-86a3-4682-a16f-7fec4830444d",
 }
 
 # ----------------------------------------------------------------
