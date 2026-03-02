@@ -29,11 +29,11 @@ NOTEBOOKS_DIR = Path(__file__).parent.parent / "notebooks"
 
 # Notebook name -> Fabric item ID (updated automatically after each sync)
 NOTEBOOK_IDS = {
-    "00_eda_bronze":             "5e1f3cd8-7311-4670-92a6-20f7a0b440a2",
-    "01_silver_ed_performance":  "f68a29ba-0d8a-450a-86cc-abd4e89552f5",
-    "02_silver_dim_hospitals":   "07634915-c084-4131-ba34-12f26bd51b40",
-    "03_gold_ed_trends":         "3d533a1e-3621-473d-b2d3-f1dceac59d37",
-    "04_graph_hospital_network": "00c288c7-860f-43ae-b424-24925239182a",
+    "00_eda_bronze":  "9d003d66-ed4e-48a9-86ad-5ea3f225b6b9",
+    "01_silver_ed_performance": "73339972-f95e-4960-bd96-acc494cbb0a8",
+    "02_silver_dim_hospitals": "5659ca98-c1f7-4d17-bc1b-8f27e92cdce4",
+    "03_gold_ed_trends":  "1bcd7f6f-5051-4c46-bd25-0268ec04eae8",
+    "04_graph_hospital_network": "753b2e92-3d9c-4f98-a1a7-782697258217",
 }
 
 # ----------------------------------------------------------------
@@ -114,6 +114,12 @@ def create_notebook(name: str, path: Path, token: str) -> str | None:
         print(f"    202 with no operation URL, waiting 5s then searching by name...")
         time.sleep(5)
         return _find_by_name(name, token)
+
+    # Fabric name propagation delay after delete - retry with backoff
+    if resp.status_code == 400:
+        err = resp.json()
+        if err.get("errorCode") == "ItemDisplayNameNotAvailableYet":
+            return None   # caller will retry
 
     print(f"    [ERR] create returned {resp.status_code}: {resp.text[:300]}")
     return None
@@ -206,18 +212,24 @@ def sync_notebook(name: str, token: str) -> str | None:
     if old_id:
         print(f"  [DEL]  {name} (id={old_id[:8]}...)")
         delete_notebook(old_id, token)
-        time.sleep(2)   # brief propagation pause
+        print(f"    waiting 20s for Fabric name propagation...")
+        time.sleep(20)
     else:
         print(f"  [NEW]  {name} -- no existing ID, creating fresh")
 
-    # Step 2: create fresh
-    new_id = create_notebook(name, path, token)
-    if new_id:
-        print(f"  [OK]   {name} -> {new_id}")
-        return new_id
-    else:
-        print(f"  [ERR]  {name} -- create failed")
-        return None
+    # Step 2: create fresh (retry up to 4x if name not yet available)
+    for attempt in range(1, 5):
+        new_id = create_notebook(name, path, token)
+        if new_id:
+            print(f"  [OK]   {name} -> {new_id}")
+            return new_id
+        if attempt < 4:
+            wait = attempt * 15
+            print(f"    name not available yet, retrying in {wait}s (attempt {attempt}/4)...")
+            time.sleep(wait)
+
+    print(f"  [ERR]  {name} -- create failed after retries")
+    return None
 
 def resolve_notebooks(arg: str | None) -> list[str]:
     """Return list of notebook names matching the arg, or all if None."""
