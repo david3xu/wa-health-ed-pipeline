@@ -8,7 +8,6 @@ CREATE OR ALTER VIEW vw_underperforming_hospitals AS
 SELECT
     hospital_name,
     health_service,
-    suburb,
     time_period_start,
     four_hour_departure_rate,
     wa_average,
