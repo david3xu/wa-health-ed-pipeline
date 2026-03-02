@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+.installed.cfg
+lib/
+lib64/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Azure credentials — never commit
+.azure/
+azure.conf
+*.pem
+*.key
+service_principal.json
+
+# Spark / Delta Lake local output
+spark-warehouse/
+derby.log
+metastore_db/
+__pycache__/
+
+# Test cache
+.pytest_cache/
+tests/__pycache__/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Local data — raw files stay out of git, use ingest_bronze.py
+data/
+*.json.bak
