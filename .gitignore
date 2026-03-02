@@ -60,3 +60,6 @@ Thumbs.db
 # Local data — raw files stay out of git, use ingest_bronze.py
 data/
 *.json.bak
+
+# Local planning docs — not for public repo
+Azure_DE_Job_Target_Plan.md
