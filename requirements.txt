@@ -1,0 +1,10 @@
+# Runtime deps for local scripts (ingestion + Fabric sync)
+azure-storage-file-datalake>=12.14.0
+azure-identity>=1.15.0
+requests>=2.31.0
+watchdog>=4.0.0
+
+# Testing
+pyspark==3.5.0
+delta-spark==3.0.0
+pytest>=8.0.0
