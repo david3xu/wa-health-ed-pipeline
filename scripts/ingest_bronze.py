@@ -122,6 +122,38 @@ def ingest_wa_hospitals(client):
         print(f"  ERROR fetching reporting units: {e}", file=sys.stderr)
 
 # ----------------------------------------------------------------
+# Ingest datasets metadata — time period lookup table
+# data_set_id → reporting_start_date, reporting_end_date
+# ----------------------------------------------------------------
+def ingest_datasets(client):
+    print("\n=== Datasets Metadata (time period lookup) ===")
+    url = f"{AIHW_BASE}/datasets"
+    print(f"Fetching all datasets from {url} ...")
+    try:
+        resp = requests.get(url, timeout=180, headers=HEADERS)
+        resp.raise_for_status()
+        datasets = resp.json().get("result", [])
+
+        # Keep only fields needed for time period lookup
+        slim = [
+            {
+                "data_set_id":          d["data_set_id"],
+                "reporting_start_date": d["reporting_start_date"],
+                "reporting_end_date":   d["reporting_end_date"],
+                "measure_code":         d.get("reported_measure_summary", {})
+                                         .get("measure_summary", {})
+                                         .get("measure_code")
+            }
+            for d in datasets
+        ]
+
+        data = json.dumps({"result": slim}, indent=2).encode("utf-8")
+        print(f"  {len(slim)} datasets, {len(data):,} bytes")
+        upload_to_onelake(client, "bronze/aihw/datasets/datasets.json", data)
+    except Exception as e:
+        print(f"  ERROR fetching datasets: {e}", file=sys.stderr)
+
+# ----------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------
 if __name__ == "__main__":
@@ -132,11 +164,11 @@ if __name__ == "__main__":
 
     ingest_aihw_measures(client)
     ingest_wa_hospitals(client)
+    ingest_datasets(client)
 
     print("\nBronze ingestion complete.")
     print("Files uploaded to OneLake:")
-    print(f"  bronze/aihw/measures/MYH0005/raw.json")
-    print(f"  bronze/aihw/measures/MYH0010/raw.json")
-    print(f"  bronze/aihw/measures/MYH0011/raw.json")
-    print(f"  bronze/aihw/measures/MYH0013/raw.json")
+    for code in MEASURE_CODES:
+        print(f"  bronze/aihw/measures/{code}/raw.json")
     print(f"  bronze/aihw/reporting_units/wa_hospitals.json")
+    print(f"  bronze/aihw/datasets/datasets.json")
